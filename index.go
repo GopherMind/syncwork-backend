@@ -9,6 +9,7 @@ import (
 )
 
 func main(){
+	//server
 	app := fiber.New()
 
 	app.Use(logger.New())
