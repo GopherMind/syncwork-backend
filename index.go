@@ -10,10 +10,10 @@ import (
 
 func main(){
 	//server
-	app := fiber.New()
+	server := fiber.New()
 
-	app.Use(logger.New())
-	app.Use(recover.New())
+	server.Use(logger.New())
+	server.Use(recover.New())
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(server.Listen(":3000"))
 }
