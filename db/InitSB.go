@@ -1,18 +1,21 @@
 package db
 
 import (
-	"fmt"
 	"github.com/supabase-community/supabase-go"
 	"os"
 )
 
-func InitSupabase() (*supabase.Client, error) {
+var SB *supabase.Client
+func InitSupabase() {
 	anonKey := os.Getenv("ANON_KEY")
 	url := os.Getenv("SUPABASE_URL")
 
-	if anonKey == "" || url == "" {
-		return nil, fmt.Errorf("wrong env config")
-	}
-
-	return supabase.NewClient(url, anonKey, nil)
+	client, err := supabase.NewClient(url, anonKey, nil)
+    if err != nil {
+        panic("Ошибка подключения к Supabase")
+	
+    }
+	SB = client
 }
+
+
