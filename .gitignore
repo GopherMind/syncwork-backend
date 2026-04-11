@@ -1,3 +1,4 @@
 .ENV
-go.sum
-vendor/
+.env
+*.env
+.env.local
