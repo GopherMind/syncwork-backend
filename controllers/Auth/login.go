@@ -1,11 +1,13 @@
 package auth
 
 import (
+
 	"github.com/GopherMind/syncwork-backend/db"
 	"github.com/GopherMind/syncwork-backend/models"
+	"github.com/GopherMind/syncwork-backend/utils/hashPassword"
+	"github.com/GopherMind/syncwork-backend/utils/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/supabase-community/gotrue-go/types"
-	"github.com/GopherMind/syncwork-backend/utils/jwt"
 )
 
 func Login(c *fiber.Ctx) error {
@@ -19,10 +21,10 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "empty fields"})
 
 	}
-
+	hashedPassword, err := hashpassword.HashPassword(bodyUser.Password)
 	authResp, err := db.SB.Auth.Signup(types.SignupRequest{
 		Email:    bodyUser.Email,
-		Password: bodyUser.Password,
+		Password: hashedPassword,
 	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Auth failed: " + err.Error()})
