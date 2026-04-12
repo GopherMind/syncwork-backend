@@ -1,4 +1,4 @@
-package router
+package Router
 
 import (
 	"github.com/GopherMind/syncwork-backend/controllers/Auth"

@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/GopherMind/syncwork-backend/db"
-	"github.com/GopherMind/syncwork-backend/router"
+	"github.com/GopherMind/syncwork-backend/Router"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -16,7 +16,7 @@ func main() {
 
 	db.InitSupabase()
 	server := fiber.New()
-	router.AuthRoutes(server)
+	Router.AuthRoutes(server)
 
 	server.Use(logger.New())
 	server.Use(recover.New())

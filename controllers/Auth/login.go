@@ -5,6 +5,7 @@ import (
 	"github.com/GopherMind/syncwork-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/supabase-community/gotrue-go/types"
+	"github.com/GopherMind/syncwork-backend/utils/jwt"
 )
 
 func Login(c *fiber.Ctx) error {
@@ -39,8 +40,13 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Auth failed: " + err.Error()})
 	}
-
-	return c.Status(200).JSON(fiber.Map{"message": "User created successfully"})
+	token, err := jwt.Createjwt(bodyUser)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "jwt create error: " + err.Error()})
+	}
+	return c.Status(200).JSON(fiber.Map{
+		"token": token,
+	})
 }
 
 /*
