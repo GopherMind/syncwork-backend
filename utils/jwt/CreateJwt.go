@@ -14,9 +14,9 @@ var jwtSecretKey = []byte(os.Getenv("SECRET_KEY_JWT"))
 func Createjwt(u models.UserAuth) (string, error) {
 
 	claims := models.UserClaims{
-		Name: u.Name,
+		Name: u.Name ,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(720 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
