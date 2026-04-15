@@ -41,8 +41,8 @@ func Signin(c *fiber.Ctx) error {
 	resp, err := db.SB.Auth.SignInWithEmailPassword(bodyUser.Email, bodyUser.Password)
     if err != nil {
         return c.Status(400).JSON(fiber.Map{
-            "error": "FAILED_TO_SIGNIN_DB",
-            "message": "error to connect db",
+            "error": "USER_NOT_FOUND",
+            "message": "users is not found",
         })
     }
 
@@ -62,6 +62,7 @@ func Signin(c *fiber.Ctx) error {
         })
     }
 
+    bodyUser.Id = resp.User.ID.String()
     bodyUser.Name = result[0]["name"].(string)
     token, err := jwt.Createjwt(bodyUser)
     if err != nil {
