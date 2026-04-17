@@ -26,7 +26,7 @@ func main() {
 	server.Use(logger.New())
 	server.Use(recover.New())
 	Router.AuthRoutes(server)
-	
+	Router.TaskRoutes(server)
 
 	log.Fatal(server.Listen(":3000"))
 }
