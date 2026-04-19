@@ -6,7 +6,7 @@ import (
 )
 
 type Task struct {
-	ID          int64     `json:"id"`
+	ID          string    `json:"id"`
 	CreatedAt   time.Time `json:"created_at"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
@@ -14,6 +14,9 @@ type Task struct {
 	Stack       []string  `json:"stack"`
 	Status      string    `json:"status"`
 	ClientID    string    `json:"client_id"`
+	Profiles    struct {
+		Name string `json:"name"`
+	} `json:"profiles"`
 }
 type TaskQuery struct {
 	Limit    int      `query:"limit"`

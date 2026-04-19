@@ -13,7 +13,10 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Warning: Error loading .env file:", err)
+	}
 
 	db.InitSupabase()
 	server := fiber.New()

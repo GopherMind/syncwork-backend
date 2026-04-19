@@ -7,13 +7,13 @@ import (
 
 var SB *supabase.Client
 func InitSupabase() {
-	anonKey := os.Getenv("ANON_KEY")
+	secretKey := os.Getenv("SECRET_KEY")
 	url := os.Getenv("SUPABASE_URL")
 
-	client, err := supabase.NewClient(url, anonKey, nil)
+	client, err := supabase.NewClient(url, secretKey, nil)
     if err != nil {
         panic("Ошибка подключения к Supabase")
-	
+
     }
 	SB = client
 }

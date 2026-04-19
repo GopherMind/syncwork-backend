@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log"
 	"github.com/GopherMind/syncwork-backend/db"
 	"github.com/GopherMind/syncwork-backend/models"
 	"github.com/GopherMind/syncwork-backend/utils/jwt"
@@ -59,36 +60,50 @@ func Register(c *fiber.Ctx) error {
 		Password: bodyUser.Password,
 	})
 	if err != nil {
+		log.Printf("Signup failed: %v", err)
 		return c.Status(409).JSON(fiber.Map{
 			"error":   "SIGNUP_FAILED",
 			"message": "Email already exists or invalid credentials",
 		})
 	}
+	log.Printf("User created successfully with ID: %s", authResp.User.ID.String())
 
 	newProfile := map[string]interface{}{
-		"id":          authResp.User.ID,
-		"name":        bodyUser.Name,
-		"description": bodyUser.Description,
-		"url":         bodyUser.Url,
-		"role":        bodyUser.Role,
+		"id":   authResp.User.ID.String(),
+		"name": bodyUser.Name,
+		"role": bodyUser.Role,
 	}
 
+	if bodyUser.Description != "" {
+		newProfile["description"] = bodyUser.Description
+	}
+	if bodyUser.Url != "" {
+		newProfile["url"] = bodyUser.Url
+	}
+
+	log.Printf("Attempting to insert profile: %+v", newProfile)
 	_, _, err = db.SB.From("profiles").Insert(newProfile, false, "", "minimal", "").Execute()
 	if err != nil {
+		log.Printf("Profile creation failed with error: %v", err)
+		log.Printf("Profile data was: %+v", newProfile)
 		return c.Status(500).JSON(fiber.Map{
 			"error":   "PROFILE_CREATION_FAILED",
 			"message": "User created but profile setup failed",
 		})
 	}
+	log.Printf("Profile created successfully for user ID: %s", authResp.User.ID.String())
 
 	bodyUser.Id = authResp.User.ID.String()
+	log.Printf("Creating JWT token for user ID: %s", bodyUser.Id)
 	token, err := jwt.Createjwt(bodyUser)
 	if err != nil {
+		log.Printf("Token generation failed: %v", err)
 		return c.Status(500).JSON(fiber.Map{
 			"error":   "TOKEN_GENERATION_FAILED",
 			"message": "Registration successful but token generation failed",
 		})
 	}
+	log.Printf("Token generated successfully")
 
 	return c.Status(201).JSON(fiber.Map{"token": token})
 }

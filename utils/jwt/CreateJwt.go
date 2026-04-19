@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	
+	"log"
 	"os"
 	"time"
 
@@ -9,9 +9,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecretKey = []byte(os.Getenv("SECRET_KEY_JWT"))
-
 func Createjwt(u models.UserAuth) (string, error) {
+	jwtSecretKey := []byte(os.Getenv("SECRET_KEY_JWT"))
+
+	if len(jwtSecretKey) == 0 {
+		log.Printf("WARNING: SECRET_KEY_JWT is empty or not set!")
+	}
 
 	claims := models.UserClaims{
 		Id: u.Id,
@@ -24,6 +27,7 @@ func Createjwt(u models.UserAuth) (string, error) {
 	tokenString, err := token.SignedString(jwtSecretKey)
 
 	if err != nil {
+		log.Printf("Error signing token: %v", err)
 		return "", err
 	}
 

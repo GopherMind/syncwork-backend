@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(timeout 10 go run index.go)",
+      "Bash(go run:*)",
+      "Bash(tee server_output.log)",
+      "Bash(sleep 3 curl -X POST http://localhost:3000/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"testuser999@test.com\",\"password\":\"123456\",\"name\":\"Test User\",\"role\":\"freelancer\"}' sleep 2 cat server_output.log taskkill //F //IM go.exe)",
+      "Bash(netstat -ano)",
+      "Bash(xargs -I {} taskkill //F //PID {})",
+      "Bash(curl -X POST http://localhost:3000/auth/signin -H \"Content-Type: application/json\" -d '{\"email\":\"testuser1745343818@test.com\",\"password\":\"123456\"}')",
+      "Bash(wait)",
+      "Bash(curl -X POST http://localhost:3000/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"__TRACKED_VAR__\",\"password\":\"123456\",\"name\":\"Test User\",\"role\":\"freelancer\"}')",
+      "Bash(curl -X POST http://localhost:3000/auth/signin -H 'Content-Type: application/json' -d '{\"email\":\"__TRACKED_VAR__\",\"password\":\"123456\"}')"
     ]
   }
 }
