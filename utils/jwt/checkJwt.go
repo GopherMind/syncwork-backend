@@ -15,6 +15,7 @@ func CheckJwt(tokenJwt string) (*models.UserClaims, error) {
 	if secretKey == "" {
 		return nil, errors.New("SECRET_KEY_JWT is empty")
 	}
+	println("SECRET_KEY_JWT length:", len(secretKey))
 
 	token, err := jwt.ParseWithClaims(tokenJwt, &models.UserClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {

@@ -36,9 +36,9 @@ func CreateTask(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Task content is not allowed"})
 	}
 
-	idUserRaw := c.Locals("id_user")
-	idUser, ok := idUserRaw.(int)
-	if !ok || idUser == 0 {
+	idUserRaw := c.Locals("user_id")
+	idUser, ok := idUserRaw.(string)
+	if !ok || idUser == "" {
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 	createData := map[string]interface{}{

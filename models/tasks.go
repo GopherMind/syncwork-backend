@@ -22,5 +22,5 @@ type TaskQuery struct {
 	Limit    int      `query:"limit"`
 	PriceMin int      `query:"price_min"`
 	PriceMax int      `query:"price_max"`
-	Stack    []string `query:"stack"`
+	Search   string   `query:"search"`
 }
