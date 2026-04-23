@@ -11,6 +11,8 @@ func TaskRoutes(app *fiber.App) {
 
 	group.Get("/getTasks", tasks.GetTasks)
 	group.Post("/createTask", middleware.AuthMiddleware, tasks.CreateTask)
+	group.Get("/getTask/:id", tasks.GetSingleTask)
 }
 
 // пример запроса: http://localhost:3000/tasks/getTasks?limit=10&price_min=100&price_max=500
+// 

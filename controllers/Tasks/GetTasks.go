@@ -43,4 +43,3 @@ func GetTasks(c *fiber.Ctx) error {
 	return c.JSON(tasks)
 }
 
-// пример запроса: http://localhost:3000/tasks/getTasks?limit=10&price_min=100&price_max=500
