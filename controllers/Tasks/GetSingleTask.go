@@ -20,13 +20,11 @@ func GetSingleTask(c *fiber.Ctx) error {
 	task := tasks[0]
 
 	var propals []map[string]interface{}
-	countPropals, err := db.SB.From("propals").Select("*", "", false).Eq("task_id", taskID).ExecuteTo(&propals)
-	if err != nil {
+	if _, err := db.SB.From("propals").Select("*", "", false).Eq("task_id", taskID).ExecuteTo(&propals); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch proposals", "details": err.Error()})
 	}
-	task.Proposals = int(countPropals)
+	task.Proposals = len(propals)
 
 	return c.Status(200).JSON(task)
 }
 
-//single task request example: http://localhost:3000/tasks/getTask/1
