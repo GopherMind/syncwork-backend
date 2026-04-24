@@ -17,17 +17,15 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		token = token[7:]
 	}
 
-	println("Token after cleanup:", token)
 	claims, err := jwt.CheckJwt(token)
 
 	if err != nil {
 		println("JWT Check Error:", err.Error())
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "wrong token",
+			"error":   "wrong token",
 			"details": err.Error(),
 		})
 	}
-	println("Claims ID:", claims.Id)
 
 	c.Locals("user_id", claims.Id)
 
