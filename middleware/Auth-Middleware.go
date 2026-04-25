@@ -1,12 +1,15 @@
 package middleware
 
 import (
+	"log"
+
 	"github.com/GopherMind/syncwork-backend/utils/jwt"
 	"github.com/gofiber/fiber/v2"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
 	token := c.Get("Authorization")
+	
 	if token == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Токен отсутствует",
@@ -26,7 +29,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 			"details": err.Error(),
 		})
 	}
-
+log.Printf("Authenticated user ID: %s", claims.Id)
 	c.Locals("user_id", claims.Id)
 
 	return c.Next()
