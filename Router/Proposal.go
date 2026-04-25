@@ -10,4 +10,5 @@ func ProposalRoute(app *fiber.App) {
 	group := app.Group("/proposal")
 
 	group.Post("/create/:task", middleware.AuthMiddleware, propasals.CreateProposal)
+	group.Post("/deny/:id", middleware.AuthMiddleware, propasals.DeniedProposal)
 }
