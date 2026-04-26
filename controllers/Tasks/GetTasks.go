@@ -22,7 +22,7 @@ func GetTasks(c *fiber.Ctx) error {
 		query.Limit = 6
 	}
 
-	q := db.SB.From("tasks").Select("*, profiles(name)", "", false).Limit(query.Limit, "")
+	q := db.SB.From("tasks").Select("*, profiles(name)", "", false).Limit(query.Limit, "").Eq("status", "open")
 
 	if query.PriceMin > 0 {
 		q = q.Gte("budget", strconv.Itoa(query.PriceMin))

@@ -28,10 +28,21 @@ func CreateProposal(c *fiber.Ctx) error {
 
 	proposalBody.UserID = idUser
 	proposalBody.TaskID = taskId
-	
 	proposalBody.Status = "pending"
 	
-	_, _, err := db.SB.From("propals").Insert(proposalBody, false, "", "", "").Execute()
+	 var tasks []models.FullTask
+	_, err := db.SB.From("tasks").Select("id, client_id", "", false).Eq("id", taskId).ExecuteTo(&tasks)
+	if err != nil || len(tasks) == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "Task not found"})
+	}
+
+	task := tasks[0]
+
+	clientID := task.ClientID
+	if clientID == idUser {
+		return c.Status(403).JSON(fiber.Map{"error": "You cannot apply to your own task"})
+	}
+	_, _, err = db.SB.From("propals").Insert(proposalBody, false, "", "", "").Execute()
 
 	if err != nil {
 		fmt.Println(err)
