@@ -1,15 +1,18 @@
 package propasals
 
 import (
+	"fmt"
+
 	"github.com/GopherMind/syncwork-backend/db"
 	"github.com/gofiber/fiber/v2"
 )
 
 func DeniedProposal(c *fiber.Ctx) error {
 	proposalID := c.Params("id")
-	userID := c.Locals("userID")
+	userID := c.Locals("user_id")
 
 	if proposalID == "" {
+		
 		return c.Status(400).JSON(fiber.Map{
 			"error":   "BAD_REQUEST",
 			"message": "Proposal ID is required",
@@ -26,15 +29,17 @@ func DeniedProposal(c *fiber.Ctx) error {
 	var result []struct {
 		ID    string `json:"id"`
 		Tasks struct {
-			ClientID string `json:"client_id"` 
+			ClientID string `json:"client_id"`
 		} `json:"tasks"`
 	}
 
-	_, err := db.SB.From("proposals").
+	_, err := db.SB.From("propals").
 		Select("id, tasks(client_id)", "", false).
 		Eq("id", proposalID).
+		Eq("status", "pending").
 		ExecuteTo(&result)
 	if err != nil || len(result) == 0 {
+		fmt.Println(err)
 		return c.Status(404).JSON(fiber.Map{
 			"error":   "NOT_FOUND",
 			"message": "Proposal not found",
@@ -48,9 +53,10 @@ func DeniedProposal(c *fiber.Ctx) error {
 		})
 	}
 
-	_, _, err = db.SB.From("proposals").
+	_, _, err = db.SB.From("propals").
 		Update(map[string]interface{}{"status": "denied"}, "", "").
 		Eq("id", proposalID).
+		Eq("status", "pending").
 		Execute()
 
 	if err != nil {

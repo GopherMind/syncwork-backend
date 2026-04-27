@@ -3,8 +3,6 @@ package tasks
 import (
 	"strconv"
 
-	"fmt"
-
 	"github.com/GopherMind/syncwork-backend/db"
 	"github.com/GopherMind/syncwork-backend/models"
 	"github.com/gofiber/fiber/v2"
@@ -31,10 +29,7 @@ func GetTasks(c *fiber.Ctx) error {
 		q = q.Lte("budget", strconv.Itoa(query.PriceMax))
 	}
 	if query.Search != "" {
-		filter := fmt.Sprintf("title.fts.%s,stack.fts.%s,description.fts.%s",
-			query.Search, query.Search, query.Search)
-
-		q = q.Or(filter, "")
+		q = q.Or("title.ilike.%"+query.Search+"%,description.ilike.%"+query.Search+"%", "")
 	}
 	if _, err := q.ExecuteTo(&tasks); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch tasks", "details": err.Error()})
@@ -42,4 +37,3 @@ func GetTasks(c *fiber.Ctx) error {
 
 	return c.JSON(tasks)
 }
-

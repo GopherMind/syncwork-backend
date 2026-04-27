@@ -42,7 +42,14 @@ func CreateProposal(c *fiber.Ctx) error {
 	if clientID == idUser {
 		return c.Status(403).JSON(fiber.Map{"error": "You cannot apply to your own task"})
 	}
-	_, _, err = db.SB.From("propals").Insert(proposalBody, false, "", "", "").Execute()
+
+	insertData := map[string]interface{}{
+		"user_id":      proposalBody.UserID,
+		"task_id":      proposalBody.TaskID,
+		"cover_letter": proposalBody.CoverLetter,
+		"status":       proposalBody.Status,
+	}
+	_, _, err = db.SB.From("propals").Insert(insertData, false, "", "", "").Execute()
 
 	if err != nil {
 		fmt.Println(err)
