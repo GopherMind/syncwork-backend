@@ -31,6 +31,6 @@ func main() {
 	Router.AuthRoutes(server)
 	Router.TaskRoutes(server)
 	Router.ProposalRoute(server)
-
+	Router.ChatsRoutes(server)
 	log.Fatal(server.Listen(":3000"))
 }

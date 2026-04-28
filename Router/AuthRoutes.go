@@ -1,7 +1,7 @@
 package Router
 
 import (
-	auth "github.com/GopherMind/syncwork-backend/controllers/Auth"
+	 "github.com/GopherMind/syncwork-backend/controllers/Auth"
 	"github.com/GopherMind/syncwork-backend/middleware"
 	"github.com/gofiber/fiber/v2"
 )

@@ -1,7 +1,7 @@
 package Router
 
 import (
-	tasks "github.com/GopherMind/syncwork-backend/controllers/Tasks"
+    "github.com/GopherMind/syncwork-backend/controllers/Tasks"
 	"github.com/GopherMind/syncwork-backend/middleware"
 	"github.com/gofiber/fiber/v2"
 )
