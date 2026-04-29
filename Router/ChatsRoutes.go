@@ -10,4 +10,5 @@ func ChatsRoutes(app *fiber.App) {
 	group := app.Group("/chats")
 
 	group.Get("/getChats", middleware.AuthMiddleware, chats.GetChats)
+	group.Post("/createMessage/:id", middleware.AuthMiddleware, middleware.RateLimitMiddleware(5), chats.CreateMessage)
 }

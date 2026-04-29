@@ -9,7 +9,7 @@ import (
 func AuthRoutes(app *fiber.App) {
 	group := app.Group("/auth")
 
-	group.Post("/login", middleware.RateLimitMiddleware(), auth.Register)
-	group.Post("/signin", middleware.RateLimitMiddleware(), auth.Signin)
+	group.Post("/login", middleware.RateLimitMiddleware(300), auth.Register)
+	group.Post("/signin", middleware.RateLimitMiddleware(300), auth.Signin)
 	group.Get("/profile", middleware.AuthMiddleware, auth.GetProfile)
 }
