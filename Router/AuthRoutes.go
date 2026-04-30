@@ -12,4 +12,5 @@ func AuthRoutes(app *fiber.App) {
 	group.Post("/login", middleware.RateLimitMiddleware(300), auth.Register)
 	group.Post("/signin", middleware.RateLimitMiddleware(300), auth.Signin)
 	group.Get("/profile", middleware.AuthMiddleware, auth.GetProfile)
+	group.Post("/upload-avatar", middleware.AuthMiddleware, auth.LoadedImage)
 }

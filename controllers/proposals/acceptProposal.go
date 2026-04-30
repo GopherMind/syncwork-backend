@@ -117,7 +117,6 @@ func AcceptProposal(c *fiber.Ctx) error {
 		})
 	}
 
-	// --- 7. Закрываем задачу ---
 	_, _, err = db.SB.From("tasks").
 		Update(map[string]interface{}{"status": "closed"}, "", "").
 		Eq("id", proposal.TaskID).
@@ -131,7 +130,6 @@ func AcceptProposal(c *fiber.Ctx) error {
 		})
 	}
 
-	// --- 8. Ищем чат для задачи ---
 	var chats []struct {
 		ID string `json:"id"`
 	}
@@ -149,7 +147,6 @@ func AcceptProposal(c *fiber.Ctx) error {
 		})
 	}
 
-	// --- 9. Отдельная проверка: чат не найден ---
 	if len(chats) == 0 {
 		log.Printf("CRITICAL: No chat found for task %s after proposal %s accepted",
 			proposal.TaskID, proposalID)
@@ -159,7 +156,9 @@ func AcceptProposal(c *fiber.Ctx) error {
 		})
 	}
 
-	// --- 10. Добавляем исполнителя в чат ---
+	// Добавляем ОБОИХ пользователей в чат: заказчика и исполнителя
+
+	// 1. Добавляем исполнителя (того, кто откликнулся)
 	_, _, err = db.SB.From("chat_users").
 		Insert(map[string]interface{}{
 			"chat_id": chats[0].ID,
@@ -168,13 +167,33 @@ func AcceptProposal(c *fiber.Ctx) error {
 		Execute()
 
 	if err != nil {
-		log.Printf("CRITICAL: Failed to add user %s to chat %s: %v",
+		log.Printf("CRITICAL: Failed to add freelancer %s to chat %s: %v",
 			proposal.UserID, chats[0].ID, err)
 		return c.Status(500).JSON(fiber.Map{
 			"error":   "INTERNAL_SERVER_ERROR",
-			"message": "Failed to add user to chat",
+			"message": "Failed to add freelancer to chat",
 		})
 	}
+
+	// 2. Добавляем заказчика (владельца задачи)
+	_, _, err = db.SB.From("chat_users").
+		Insert(map[string]interface{}{
+			"chat_id": chats[0].ID,
+			"user_id": tasks[0].ClientID,
+		}, false, "", "", "").
+		Execute()
+
+	if err != nil {
+		log.Printf("CRITICAL: Failed to add client %s to chat %s: %v",
+			tasks[0].ClientID, chats[0].ID, err)
+		return c.Status(500).JSON(fiber.Map{
+			"error":   "INTERNAL_SERVER_ERROR",
+			"message": "Failed to add client to chat",
+		})
+	}
+
+	log.Printf("Added both users to chat %s: freelancer=%s, client=%s",
+		chats[0].ID, proposal.UserID, tasks[0].ClientID)
 
 	// --- 11. Отклоняем остальные proposals по этой задаче ---
 	_, _, err = db.SB.From("propals").
