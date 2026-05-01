@@ -3,10 +3,12 @@ package auth
 import (
 	"log"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/GopherMind/syncwork-backend/db"
 	"github.com/gofiber/fiber/v2"
+	storage_go "github.com/supabase-community/storage-go"
 )
 
 type profileRow struct {
@@ -39,6 +41,11 @@ func LoadedImage(c *fiber.Ctx) error {
 	}
 	defer fileReader.Close()
 
+	contentType := image.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "image/jpeg"
+	}
+
 	uniqueFilename := time.Now().Format("20060102150405") + "_" + image.Filename
 
 	var profiles []profileRow
@@ -47,7 +54,6 @@ func LoadedImage(c *fiber.Ctx) error {
 		Eq("id", userID.(string)).
 		ExecuteTo(&profiles)
 	if err != nil {
-		log.Printf("Error fetching existing profile image URL: %v", err)
 		return c.Status(500).JSON(fiber.Map{
 			"error":   "INTERNAL_ERROR",
 			"message": "Failed to fetch existing profile image URL",
@@ -55,33 +61,42 @@ func LoadedImage(c *fiber.Ctx) error {
 	}
 
 	if len(profiles) > 0 && profiles[0].URL != "" {
-		existingPath := url.PathEscape(profiles[0].URL)
-		_, err := db.SB.Storage.RemoveFile("avatar", []string{existingPath})
-		if err != nil {
-			log.Printf("Error removing existing profile image: %v", err)
-			return c.Status(500).JSON(fiber.Map{
-				"error":   "INTERNAL_ERROR",
-				"message": "Failed to remove existing profile image",
-			})
+		parts := strings.SplitN(profiles[0].URL, "/avatar/", 2)
+		if len(parts) == 2 && parts[1] != "" {
+			decodedKey, err := url.QueryUnescape(parts[1])
+			if err != nil {
+				decodedKey = parts[1]
+			}
+
+			log.Printf("Key to delete (decoded): %s", decodedKey)
+
+			_, err = db.SB.Storage.RemoveFile("avatar", []string{decodedKey})
+			if err != nil {
+				log.Printf("Error removing existing profile image: %v", err)
+			}
 		}
 	}
 
-	uploadResult, err := db.SB.Storage.UploadFile("avatar", uniqueFilename, fileReader)
+	uploadResult, err := db.SB.Storage.UploadFile("avatar", uniqueFilename, fileReader, storage_go.FileOptions{
+		ContentType: &contentType,
+	})
 	if err != nil {
-		log.Printf("Error uploading new profile image: %v", err)
 		return c.Status(500).JSON(fiber.Map{
 			"error":   "INTERNAL_ERROR",
 			"message": "Failed to upload new profile image",
 		})
 	}
-	imageURL := uploadResult.Key
+
+	cleanKey := strings.TrimPrefix(uploadResult.Key, "avatar/")
+
+	publicURL := db.SB.Storage.GetPublicUrl("avatar", cleanKey)
+	imageURL := publicURL.SignedURL
 
 	_, _, err = db.SB.From("profiles").
 		Update(map[string]interface{}{"url": imageURL}, "representation", "").
 		Eq("id", userID.(string)).
 		Execute()
 	if err != nil {
-		log.Printf("Error updating profile with new image URL: %v", err)
 		return c.Status(500).JSON(fiber.Map{
 			"error":   "INTERNAL_ERROR",
 			"message": "Failed to update profile with new image URL",
